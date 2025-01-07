@@ -163,48 +163,6 @@ export default class Widget {
 
           /// channel/message event handler
           const channelHandler  = new GroupChannelHandler();
-          channelHandler.onChannelChanged = channel => {
-            SendBirdDesk.Ticket.getByChannelUrl(channel.url, (res, err) => {
-              if (err) throw err;
-              const ticket = res;
-              ticket.channel = channel;
-
-              /// update ticket widget
-              let ticketElementIndex = self.ticketElementList.findIndex(
-                ticketElement => ticketElement.ticket.id === ticket.id
-              );
-              let ticketElement = ticketElementIndex >= 0 ? self.ticketElementList[ticketElementIndex] : null;
-              if (ticketElement) {
-                ticketElement.ticket = ticket;
-                ticketElement.render();
-              }
-
-              /// update ticket widget list
-              const isInitial = ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED;
-              const isClosed = ticket.status === SendBirdDesk.Ticket.Status.CLOSED;
-              const isNewest = ticketElementIndex === 0;
-              if (!isNewest && !isClosed) {
-                /// detach current widget
-                if (ticketElement) {
-                  self.ticketElementList.splice(ticketElementIndex, 1);
-                  self.ticketList.removeChild(ticketElement.element);
-                } else if (!isInitial) {
-                  ticketElement = new TicketElement(this, ticket);
-                }
-
-                /// attach the widget on the top
-                if (ticketElement) {
-                  if (self.ticketElementList.length > 0) {
-                    self.ticketList.insertBefore(ticketElement.element, self.ticketElementList[0].element);
-                    self.ticketElementList.unshift(ticketElement);
-                  } else {
-                    self.ticketElementList.push(ticketElement);
-                    self.ticketList.appendChild(ticketElement.element);
-                  }
-                }
-              }
-            });
-          };
           channelHandler.onMessageReceived = (channel, message) => {
             let data = null;
             try {
