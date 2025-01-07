@@ -28,31 +28,13 @@ export default class Widget {
     if (!options) options = {};
 
     Widget.panel = this.panel = parseDom(`<div class='-sbd-panel'>
-            <div class='-sbd-ticket-list'>
-                <div class='-sbd-ticket-new'>
-                    <div class='icon'></div>
-                    <div class='label'>Start a new conversation.</div>
-                </div>
-            </div>
+            <div class='-sbd-ticket-list'></div>
             <div class='-sbd-error'>${connectionError}</div>
         </div>`);
     this.element.appendChild(this.panel);
     this.error = simplify(this.element.querySelector('.-sbd-error'));
 
     this.ticketList = simplify(document.querySelector('.-sbd-panel > .-sbd-ticket-list'));
-
-    let ticketNew = simplify(document.querySelector('.-sbd-ticket-list > .-sbd-ticket-new'));
-    ticketNew.on('click', () => {
-      const ticketNum = ('000' + (new Date().getTime() % 1000)).slice(-3);
-      const tempTicketTitle = `Issue #${ticketNum}`;
-      this.spinner.attachTo(this.ticketList);
-      SendBirdDesk.Ticket.create(tempTicketTitle, user.nickname, (ticket, err) => {
-        if (err) throw err;
-        this.spinner.detach();
-        this.startNewDialog(ticket);
-      });
-    });
-
     this.spinner = new Spinner();
 
     /** SendBird SDK and SendBird Desk SDK init
@@ -168,6 +150,14 @@ export default class Widget {
             }
           };
           self.sendbird.groupChannel.addGroupChannelHandler('widget', channelHandler);
+
+          // Start new channel or existing channel
+          const ticketNum = ('000' + (new Date().getTime() % 1000)).slice(-3);
+          const tempTicketTitle = `Issue #${ticketNum}`;
+          SendBirdDesk.Ticket.create(tempTicketTitle, user.nickname, (ticket, err) => {
+            if (err) throw err;
+            self.startNewDialog(ticket);
+          });
         }
       );
     }
