@@ -16,7 +16,6 @@ export default class Dialog {
     this.ticket = ticket;
     this.element = parseDom(`<div class='-sbd-dialog'>
             <div class='-sbd-dialog-header'>
-                <div class='close'></div>
                 <div class='agent'>
                     <div class='profile'>
                         <img src='' alt='Profile' class='image'></img>
@@ -38,11 +37,6 @@ export default class Dialog {
         </div>`);
     this.updateAgent(ticket.agent);
     this.isOpened = false;
-
-    const close = simplify(this.element.querySelector('.close'));
-    close.on('click', () => {
-      this.close();
-    });
 
     this.messageList = simplify(this.element.querySelector('.-sbd-message-list'));
     this.messageElementList = [];
@@ -226,22 +220,6 @@ export default class Dialog {
         this.spinner.detach();
       });
     }
-  }
-  close(instant) {
-    if (instant) {
-      this.element.hide();
-      if (this.element.parentNode) {
-        this.widget.panel.removeChild(this.element);
-      }
-    } else {
-      this.element.removeClass('opened');
-      setTimeout(() => {
-        if (this.element.parentNode) {
-          this.widget.panel.removeChild(this.element);
-        }
-      }, 1000);
-    }
-    this.isOpened = false;
   }
   enableForm() {
     this.editable = true;
