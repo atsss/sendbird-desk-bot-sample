@@ -43,7 +43,6 @@ export default class Widget {
     this.error = simplify(this.element.querySelector('.-sbd-error'));
 
     this.ticketList = simplify(document.querySelector('.-sbd-panel > .-sbd-ticket-list'));
-    this.ticketElementList = [];
 
     this.ticketRevision = 0;
     this.isLoading = false;
@@ -188,19 +187,6 @@ export default class Widget {
               /// update ticket instance
               if (message.isAssigned || message.isTransferred) {
                 ticket.agent = data.ticket.agent;
-              }
-
-              const ticketElementIndex = self.ticketElementList.findIndex(
-                ticketElement => ticketElement.ticket.id === ticket.id
-              );
-              const ticketElement = ticketElementIndex >= 0 ? self.ticketElementList[ticketElementIndex] : null;
-              if (ticketElement) {
-                ticketElement.ticket = ticket;
-                ticketElement.render();
-                if (message.isClosed) {
-                  self.ticketElementList.splice(ticketElementIndex, 1);
-                  self.ticketList.removeChild(ticketElement.element);
-                }
               }
 
               // show notification
