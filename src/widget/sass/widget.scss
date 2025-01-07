@@ -239,24 +239,12 @@ body {
       position: absolute;
       right: 0;
       bottom: 75px;
-      background: transparent;
       overflow: hidden;
       @include border-radius(8px);
 
-      transform: translateY(20px);
-      transition: all 200ms;
-      opacity: 0;
-      visibility: hidden;
-
-      &.fade-in {
-        display: block;
-        visibility: visible;
-        transform: translateY(0px);
-        transition: all 200ms;
-        opacity: 1;
-        background: $color-white;
-        @include box-shadow(0 5px 40px 0 rgba(0, 0, 0, 0.15));
-      }
+      display: block;
+      background: $color-white;
+      @include box-shadow(0 5px 40px 0 rgba(0, 0, 0, 0.15));
 
       .-sbd-header {
         position: relative;

@@ -57,10 +57,6 @@ export default class Widget {
     this.currentPage = 0;
     this.payloadTicket = null;
 
-    /** SendBird Desk Widget action button
-     */
-    this.panel.toggleClass('fade-in');
-
     /** SendBird SDK and SendBird Desk SDK init
      *  NOTICE!
      *  Both this.sendbird.connect() and desk.authenticate() may have accessToken as a second param.
