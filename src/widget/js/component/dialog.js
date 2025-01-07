@@ -22,9 +22,10 @@ export default class Dialog {
                 <li class='-custom-option'>How much is Moment for a month?</li>
               </ul>
             </div>
-            <div class='-sbd-message-form'>
-                <input type='text' class='message' placeholder='${DEFAULT_PLACEHOLDER}'></input>
-            </div>
+            <form class="-sbd-message-form">
+                <textarea class="message" placeholder="${DEFAULT_PLACEHOLDER}" maxlength="500" rows="1"></textarea>
+                <button class="button">Submit</button>
+            </form>
         </div>`);
     this.isOpened = false;
 
@@ -61,6 +62,8 @@ export default class Dialog {
 
     this.form = simplify(this.element.querySelector('.-sbd-message-form'));
     this.input = simplify(this.form.querySelector('.message'));
+    this.button = simplify(this.form.querySelector('.button'));
+    console.log(this.button)
     this.editable = true;
     // Customize for suggested questions
     this.optionList = simplify(this.element.querySelector('.-custom-suggested-question-list'));
@@ -70,58 +73,56 @@ export default class Dialog {
       this.disableForm();
     }
 
-    this.input.on('keypress', e => {
-      if (e.keyCode === 13 && !e.shiftKey) {
-        e.preventDefault();
-        const text = this.input.val();
-        this.input.val('');
+    this.button.on('click', e => {
+      e.preventDefault();
+      const text = this.input.val();
+      this.input.val('');
 
-        this.optionList.fadeOut();
+      this.optionList.fadeOut();
 
-        if (text && this.editable) {
-          if (this.ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED) {
-            this.ticket.status = SendBirdDesk.Ticket.Status.UNASSIGNED;
-          }
-          const message = {
-            message: text,
-          };
-          this.ticket.channel
-            .sendUserMessage(message)
-            // .onPending((message) => {
-            // })
-            .onSucceeded((message) => {
-              if (SendBirdDesk.Message.UrlRegExp.test(message.message)) {
-                message.url = SendBirdDesk.Message.UrlRegExp.exec(message.message)[0];
-                SendBirdDesk.Ticket.getUrlPreview(message.url, (res, err) => {
-                  if (err) throw err;
-                  this.ticket.channel.updateUserMessage(
-                    message.messageId,
-                    message.message,
-                    JSON.stringify({
-                      type: SendBirdDesk.Message.DataType.URL_PREVIEW,
-                      body: {
-                        url: message.url,
-                        site_name: res.data.siteName,
-                        title: res.data.title,
-                        description: res.data.description,
-                        image: res.data.image
-                      }
-                    }),
-                    message.customType,
-                    (res, err) => {
-                      if (err) throw err;
-                      this.updateMessage(res);
-                    }
-                  );
-                });
-              }
-              this.appendMessage(message);
-              this.scrollToBottom();
-            })
-            .onFailed((error, message) => {
-              this.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
-            });
+      if (text && this.editable) {
+        if (this.ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED) {
+          this.ticket.status = SendBirdDesk.Ticket.Status.UNASSIGNED;
         }
+        const message = {
+          message: text,
+        };
+        this.ticket.channel
+          .sendUserMessage(message)
+          // .onPending((message) => {
+          // })
+          .onSucceeded((message) => {
+            if (SendBirdDesk.Message.UrlRegExp.test(message.message)) {
+              message.url = SendBirdDesk.Message.UrlRegExp.exec(message.message)[0];
+              SendBirdDesk.Ticket.getUrlPreview(message.url, (res, err) => {
+                if (err) throw err;
+                this.ticket.channel.updateUserMessage(
+                  message.messageId,
+                  message.message,
+                  JSON.stringify({
+                    type: SendBirdDesk.Message.DataType.URL_PREVIEW,
+                    body: {
+                      url: message.url,
+                      site_name: res.data.siteName,
+                      title: res.data.title,
+                      description: res.data.description,
+                      image: res.data.image
+                    }
+                  }),
+                  message.customType,
+                  (res, err) => {
+                    if (err) throw err;
+                    this.updateMessage(res);
+                  }
+                );
+              });
+            }
+            this.appendMessage(message);
+            this.scrollToBottom();
+          })
+          .onFailed((error, message) => {
+            this.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
+          });
       }
     });
 
