@@ -7,7 +7,6 @@ import { MessageCollectionInitPolicy, MessageFilter } from '@sendbird/chat/group
 
 const MESSAGE_LIMIT = 20;
 const RECENT_MESSAGE_THRESHOLD = 60; // sec
-const DEFAULT_AGENT = 'Agent';
 const DEFAULT_PLACEHOLDER = 'Write a message...';
 const DEFAULT_PLACEHOLDER_DISABLED = '';
 
@@ -15,15 +14,6 @@ export default class Dialog {
   constructor(ticket) {
     this.ticket = ticket;
     this.element = parseDom(`<div class='-sbd-dialog'>
-            <div class='-sbd-dialog-header'>
-                <div class='close'></div>
-                <div class='agent'>
-                    <div class='profile'>
-                        <img src='' alt='Profile' class='image'></img>
-                    </div>
-                    <div class='name'>${this.ticket.agent ? this.ticket.agent.name : DEFAULT_AGENT}</div>
-                </div>
-            </div>
             <div class='-sbd-message-list'>
             </div>
             <div class='-custom-suggested-question-list'>
@@ -32,17 +22,12 @@ export default class Dialog {
                 <li class='-custom-option'>How much is Moment for a month?</li>
               </ul>
             </div>
-            <div class='-sbd-message-form'>
-                <input type='text' class='message' placeholder='${DEFAULT_PLACEHOLDER}'></input>
-            </div>
+            <form class="-sbd-message-form">
+                <textarea class="message" placeholder="${DEFAULT_PLACEHOLDER}" maxlength="500" rows="1"></textarea>
+                <button class="button">Submit</button>
+            </form>
         </div>`);
-    this.updateAgent(ticket.agent);
     this.isOpened = false;
-
-    const close = simplify(this.element.querySelector('.close'));
-    close.on('click', () => {
-      this.close();
-    });
 
     this.messageList = simplify(this.element.querySelector('.-sbd-message-list'));
     this.messageElementList = [];
@@ -77,6 +62,8 @@ export default class Dialog {
 
     this.form = simplify(this.element.querySelector('.-sbd-message-form'));
     this.input = simplify(this.form.querySelector('.message'));
+    this.button = simplify(this.form.querySelector('.button'));
+    console.log(this.button)
     this.editable = true;
     // Customize for suggested questions
     this.optionList = simplify(this.element.querySelector('.-custom-suggested-question-list'));
@@ -86,60 +73,83 @@ export default class Dialog {
       this.disableForm();
     }
 
-    this.input.on('keypress', e => {
-      if (e.keyCode === 13 && !e.shiftKey) {
-        e.preventDefault();
-        const text = this.input.val();
-        this.input.val('');
+    this.button.on('click', e => {
+      e.preventDefault();
+      const text = this.input.val();
+      this.input.val('');
 
-        this.optionList.fadeOut();
+      this.optionList.fadeOut();
 
-        if (text && this.editable) {
-          if (this.ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED) {
-            this.ticket.status = SendBirdDesk.Ticket.Status.UNASSIGNED;
-          }
-          const message = {
-            message: text,
-          };
-          this.ticket.channel
-            .sendUserMessage(message)
-            // .onPending((message) => {
-            // })
-            .onSucceeded((message) => {
-              if (SendBirdDesk.Message.UrlRegExp.test(message.message)) {
-                message.url = SendBirdDesk.Message.UrlRegExp.exec(message.message)[0];
-                SendBirdDesk.Ticket.getUrlPreview(message.url, (res, err) => {
-                  if (err) throw err;
-                  this.ticket.channel.updateUserMessage(
-                    message.messageId,
-                    message.message,
-                    JSON.stringify({
-                      type: SendBirdDesk.Message.DataType.URL_PREVIEW,
-                      body: {
-                        url: message.url,
-                        site_name: res.data.siteName,
-                        title: res.data.title,
-                        description: res.data.description,
-                        image: res.data.image
-                      }
-                    }),
-                    message.customType,
-                    (res, err) => {
-                      if (err) throw err;
-                      this.updateMessage(res);
-                    }
-                  );
-                });
-              }
-              this.appendMessage(message);
-              this.scrollToBottom();
-            })
-            .onFailed((error, message) => {
-              this.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
-            });
+      if (text && this.editable) {
+        if (this.ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED) {
+          this.ticket.status = SendBirdDesk.Ticket.Status.UNASSIGNED;
         }
+        const message = {
+          message: text,
+        };
+        this.ticket.channel
+          .sendUserMessage(message)
+          // .onPending((message) => {
+          // })
+          .onSucceeded((message) => {
+            if (SendBirdDesk.Message.UrlRegExp.test(message.message)) {
+              message.url = SendBirdDesk.Message.UrlRegExp.exec(message.message)[0];
+              SendBirdDesk.Ticket.getUrlPreview(message.url, (res, err) => {
+                if (err) throw err;
+                this.ticket.channel.updateUserMessage(
+                  message.messageId,
+                  message.message,
+                  JSON.stringify({
+                    type: SendBirdDesk.Message.DataType.URL_PREVIEW,
+                    body: {
+                      url: message.url,
+                      site_name: res.data.siteName,
+                      title: res.data.title,
+                      description: res.data.description,
+                      image: res.data.image
+                    }
+                  }),
+                  message.customType,
+                  (res, err) => {
+                    if (err) throw err;
+                    this.updateMessage(res);
+                  }
+                );
+              });
+            }
+            this.appendMessage(message);
+            this.scrollToBottom();
+          })
+          .onFailed((error, message) => {
+            this.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
+          });
       }
     });
+
+    // Customize for suggested questions
+    this.options.forEach(option => {
+      option.on('click', e => {
+        this.optionList.fadeOut();
+        console.log(e.target, e.target.innerText)
+        if (this.ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED) {
+          this.ticket.status = SendBirdDesk.Ticket.Status.UNASSIGNED;
+        }
+        const message = {
+          message: e.target.innerText,
+        };
+        this.ticket.channel
+          .sendUserMessage(message)
+          // .onPending((message) => {
+          // })
+          .onSucceeded((message) => {
+            this.appendMessage(message);
+            this.scrollToBottom();
+          })
+          .onFailed((error, message) => {
+            this.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
+          });
+      })
+    })
   }
   loadMessage(next, callback) {
     if (!this.query || !next) {
@@ -202,22 +212,6 @@ export default class Dialog {
       });
     }
   }
-  close(instant) {
-    if (instant) {
-      this.element.hide();
-      if (this.element.parentNode) {
-        this.widget.panel.removeChild(this.element);
-      }
-    } else {
-      this.element.removeClass('opened');
-      setTimeout(() => {
-        if (this.element.parentNode) {
-          this.widget.panel.removeChild(this.element);
-        }
-      }, 1000);
-    }
-    this.isOpened = false;
-  }
   enableForm() {
     this.editable = true;
     this.form.removeClass('disabled');
@@ -229,23 +223,6 @@ export default class Dialog {
     this.form.addClass('disabled');
     this.input.attr('readonly', 'readonly');
     this.input.attr('placeholder', DEFAULT_PLACEHOLDER_DISABLED);
-  }
-  updateAgent(agent) {
-    if (this.ticket) this.ticket.agent = agent;
-    let profileImage = simplify(this.element.querySelector('.agent .profile .image'));
-    let agentName = simplify(this.element.querySelector('.agent .name'));
-    if (agent) {
-      if (agent.profileUrl) {
-        profileImage.attr('src', agent.profileUrl);
-        profileImage.show();
-      } else {
-        profileImage.hide();
-      }
-      agentName.html(agent.name || DEFAULT_AGENT);
-    } else {
-      profileImage.hide();
-      agentName.html(DEFAULT_AGENT);
-    }
   }
   isMessageStreak(recent, adjacent) {
     return (
