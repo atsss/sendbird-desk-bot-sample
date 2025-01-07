@@ -4,13 +4,10 @@ import SendBirdDesk from 'sendbird-desk';
 
 import { simplify } from './simplify.js';
 import { parseDom } from './domparser.js';
-import Broadcast from './broadcast.js';
 
 import Dialog from './component/dialog.js';
 import Spinner from './component/spinner.js';
-import TicketElement from './component/ticket.js';
 import MessageElement from './component/message.js';
-import NotificationElement from './component/notification.js';
 import { setSb } from './globalStore.js';
 
 /** Default settings
@@ -63,7 +60,9 @@ export default class Widget {
         console.log('sendbird sdk init error', error);
         throw error;
       }
+
       if (DEBUG) SendBirdDesk.setDebugMode();
+
       SendBirdDesk.init(self.sendbird);
       SendBirdDesk.authenticate(
         user.userId,
@@ -109,6 +108,7 @@ export default class Widget {
             self.spinner.detach();
             self.error.show();
           };
+
           self.sendbird.addConnectionHandler('widget', connectionHandler);
 
           /// channel/message event handler
