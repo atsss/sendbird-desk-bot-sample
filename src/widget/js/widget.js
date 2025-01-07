@@ -6,7 +6,6 @@ import { simplify } from './simplify.js';
 import { parseDom } from './domparser.js';
 
 import Dialog from './component/dialog.js';
-import Spinner from './component/spinner.js';
 import MessageElement from './component/message.js';
 import { setSb } from './globalStore.js';
 
@@ -25,14 +24,10 @@ export default class Widget {
     if (!options) options = {};
 
     Widget.panel = this.panel = parseDom(`<div class='-sbd-panel'>
-            <div class='-sbd-ticket-list'></div>
             <div class='-sbd-error'>${connectionError}</div>
         </div>`);
     this.element.appendChild(this.panel);
     this.error = simplify(this.element.querySelector('.-sbd-error'));
-
-    this.ticketList = simplify(document.querySelector('.-sbd-panel > .-sbd-ticket-list'));
-    this.spinner = new Spinner();
 
     /** SendBird SDK and SendBird Desk SDK init
      *  NOTICE!
@@ -71,7 +66,6 @@ export default class Widget {
           /// connection event handler
           const connectionHandler = new ConnectionHandler();
           connectionHandler.onReconnectStarted = () => {
-            self.spinner.attachTo(self.ticketList);
           };
           connectionHandler.onReconnectSucceeded = () => {
             self.error.hide();
@@ -97,15 +91,11 @@ export default class Widget {
                     }
                     self.dialog.scrollToBottom();
                   }
-                  self.spinner.detach();
                 }
               });
-            } else {
-              self.spinner.detach();
             }
           };
           connectionHandler.onReconnectFailed = () => {
-            self.spinner.detach();
             self.error.show();
           };
 
