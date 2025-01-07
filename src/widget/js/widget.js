@@ -30,11 +30,6 @@ export default class Widget {
     Widget.panel = this.panel = parseDom(`<div class='-sbd-panel'>
             <div class='-sbd-header'>
                 <div class='-sbd-title'>Inbox</div>
-                <div class='-sbd-tabs'>
-                    <div class='-sbd-tab-item' data-status='${SendBirdDesk.Ticket.Status.OPEN}'>OPEN</div>
-                    <div class='-sbd-tab-item' data-status='${SendBirdDesk.Ticket.Status.CLOSED}'>CLOSED</div>
-                    <div class='-sbd-tab-bar'></div>
-                </div>
                 <div class='-sbd-menu'><div class='icon'></div></div>
                 <div class='-sbd-menu-list'>
                   <div class='-sbd-menu-item' data-cmd='signout'>Sign out</div>
@@ -50,15 +45,6 @@ export default class Widget {
         </div>`);
     this.element.appendChild(this.panel);
     this.error = simplify(this.element.querySelector('.-sbd-error'));
-
-    let tabs = simplify(document.querySelectorAll('.-sbd-tabs > .-sbd-tab-item'));
-    let tabBar = simplify(document.querySelector('.-sbd-tabs > .-sbd-tab-bar'));
-    for (let i = 0; i < tabs.length; i++) {
-      tabs[i].on('click', e => {
-        let status = e.target.getAttribute('data-status');
-        selectTab(status);
-      });
-    }
 
     let menu = simplify(document.querySelector('.-sbd-menu'));
     let menuList = simplify(document.querySelector('.-sbd-menu-list'));
@@ -83,24 +69,6 @@ export default class Widget {
     this.ticketRevision = 0;
     this.isLoading = false;
     this.noMoreTicket = false;
-    this.ticketList.on('scroll', () => {
-      if (!this.isLoading && !this.noMoreTicket && this.isBottom()) {
-        this.isLoading = true;
-        this.currentPage++;
-
-        const lastRevision = this.ticketRevision;
-        this.loadTicket(this.currentTab, this.currentPage, (list, err) => {
-          if (!err) {
-            if (this.ticketRevision === lastRevision) {
-              for (let i in list) {
-                this.appendTicket(list[i]);
-              }
-            }
-          }
-          this.isLoading = false;
-        });
-      }
-    });
 
     let ticketNew = simplify(document.querySelector('.-sbd-ticket-list > .-sbd-ticket-new'));
     ticketNew.on('click', () => {
@@ -115,44 +83,8 @@ export default class Widget {
     });
 
     this.spinner = new Spinner();
-    this.currentTab = '';
     this.currentPage = 0;
     this.payloadTicket = null;
-    let selectTab = tab => {
-      if (tab != this.currentTab) {
-        for (let i = 0; i < tabs.length; i++) {
-          let status = tabs[i].attr('data-status');
-          if (status === tab) {
-            tabBar.style.left = tabs[i].offsetLeft + 'px';
-          }
-        }
-
-        if (tab === SendBirdDesk.Ticket.Status.OPEN) ticketNew.show();
-        else ticketNew.hide();
-
-        this.currentTab = tab;
-        this.currentPage = 0;
-        this.ticketRevision++;
-        this.clearTicket();
-
-        const lastRevision = this.ticketRevision;
-        this.spinner.attachTo(this.ticketList);
-        this.loadTicket(tab, this.currentPage, (list, err) => {
-          this.spinner.detach();
-          if (!err) {
-            if (this.ticketRevision === lastRevision) {
-              for (let i in list) {
-                this.appendTicket(list[i]);
-              }
-              if (this.payloadTicket) {
-                this.startNewDialog(this.payloadTicket);
-                this.payloadTicket = null;
-              }
-            }
-          }
-        });
-      }
-    };
 
     /** SendBird Desk Widget action button
      */
@@ -163,11 +95,8 @@ export default class Widget {
       this.active = !this.active;
       this.action.toggleClass('is-active');
       this.panel.toggleClass('fade-in');
-      if (this.active) {
-        selectTab(SendBirdDesk.Ticket.Status.OPEN);
-      } else if (this.dialog) {
+      if (!this.active && this.dialog) {
         setTimeout(() => {
-          this.currentTab = '';
           this.dialog.close(true);
         }, 500);
       }
@@ -223,8 +152,6 @@ export default class Widget {
           };
           connectionHandler.onReconnectSucceeded = () => {
             if (self.active) {
-              const lastTab = self.currentTab;
-              self.currentTab = '';
               self.error.hide();
 
               if (self.dialog && self.dialog.isOpened) {
@@ -250,11 +177,9 @@ export default class Widget {
                     }
                     self.spinner.detach();
                   }
-                  selectTab(lastTab);
                 });
               } else {
                 self.spinner.detach();
-                selectTab(lastTab);
               }
             }
           };
@@ -288,7 +213,7 @@ export default class Widget {
               const isInitial = ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED;
               const isClosed = ticket.status === SendBirdDesk.Ticket.Status.CLOSED;
               const isNewest = ticketElementIndex === 0;
-              if (self.currentTab !== SendBirdDesk.Ticket.Status.CLOSED && !isNewest && !isClosed) {
+              if (!isNewest && !isClosed) {
                 /// detach current widget
                 if (ticketElement) {
                   self.ticketElementList.splice(ticketElementIndex, 1);
@@ -311,114 +236,110 @@ export default class Widget {
             });
           };
           channelHandler.onMessageReceived = (channel, message) => {
-            if (!self.currentTab || self.currentTab === SendBirdDesk.Ticket.Status.OPEN) {
+            let data = null;
+            try {
+              data = message.data ? JSON.parse(message.data) : null;
+            } catch (e) {
+              throw e;
+            }
+
+            SendBirdDesk.Ticket.getByChannelUrl(channel.url, (res, err) => {
+              if (err) throw err;
+              const ticket = res;
+              if (data && data.ticket) ticket.status = data.ticket.status;
+
+              /** check if the message is system message
+               *  - isAssigned indicates that the ticket is assigned by an agent
+               *  - isTransferred indicates that the ticket is assigned to another agent
+               *  - isClosed indicates that the ticket is actually closed
+               */
+              message.isAssigned = data && data.type === SendBirdDesk.Message.DataType.TICKET_ASSIGN;
+              message.isTransferred = data && data.type === SendBirdDesk.Message.DataType.TICKET_TRANSFER;
+              message.isClosed = data && data.type === SendBirdDesk.Message.DataType.TICKET_CLOSE;
+
+              /// update ticket instance
+              if (message.isAssigned || message.isTransferred) {
+                ticket.agent = data.ticket.agent;
+              }
+
+              const ticketElementIndex = self.ticketElementList.findIndex(
+                ticketElement => ticketElement.ticket.id === ticket.id
+              );
+              const ticketElement = ticketElementIndex >= 0 ? self.ticketElementList[ticketElementIndex] : null;
+              if (ticketElement) {
+                ticketElement.ticket = ticket;
+                ticketElement.render();
+                if (message.isClosed) {
+                  self.ticketElementList.splice(ticketElementIndex, 1);
+                  self.ticketList.removeChild(ticketElement.element);
+                }
+              }
+
+              // show notification
+              if (!self.active) {
+                if (SendBirdDesk.isDeskChannel(channel)) {
+                  if (MessageElement.isVisible(message)) {
+                    const notification = new NotificationElement(ticket, message);
+                    notification.render();
+                    notification.onClick(ticket => {
+                      notification.close();
+                      self.payloadTicket = ticket;
+                      self.action.click();
+                    });
+                    notification.open(this);
+                  }
+                }
+              }
+            });
+            if (self.dialog && self.dialog.isOpened) {
+              if (self.dialog.ticket.channel.url === channel.url) {
+                if (MessageElement.isVisible(message)) {
+                  self.dialog.appendMessage(message);
+                }
+                self.dialog.ticket.channel.markAsRead(() => {});
+              }
+            }
+          };
+          channelHandler.onMessageUpdated = (channel, message) => {
+            SendBirdDesk.Ticket.getByChannelUrl(channel.url, (res, err) => {
+              if (err) throw err;
+              const ticket = res;
               let data = null;
               try {
                 data = message.data ? JSON.parse(message.data) : null;
               } catch (e) {
                 throw e;
               }
+              if (data && data.ticket) ticket.status = data.ticket.status;
 
-              SendBirdDesk.Ticket.getByChannelUrl(channel.url, (res, err) => {
-                if (err) throw err;
-                const ticket = res;
-                if (data && data.ticket) ticket.status = data.ticket.status;
+              let ticketElementIndex = self.ticketElementList.findIndex(
+                ticketElement => ticketElement.ticket.id === ticket.id
+              );
+              let ticketElement = ticketElementIndex >= 0 ? self.ticketElementList[ticketElementIndex] : null;
 
-                /** check if the message is system message
-                 *  - isAssigned indicates that the ticket is assigned by an agent
-                 *  - isTransferred indicates that the ticket is assigned to another agent
-                 *  - isClosed indicates that the ticket is actually closed
-                 */
-                message.isAssigned = data && data.type === SendBirdDesk.Message.DataType.TICKET_ASSIGN;
-                message.isTransferred = data && data.type === SendBirdDesk.Message.DataType.TICKET_TRANSFER;
-                message.isClosed = data && data.type === SendBirdDesk.Message.DataType.TICKET_CLOSE;
-
-                /// update ticket instance
-                if (message.isAssigned || message.isTransferred) {
-                  ticket.agent = data.ticket.agent;
-                }
-
-                const ticketElementIndex = self.ticketElementList.findIndex(
-                  ticketElement => ticketElement.ticket.id === ticket.id
-                );
-                const ticketElement = ticketElementIndex >= 0 ? self.ticketElementList[ticketElementIndex] : null;
-                if (ticketElement) {
-                  ticketElement.ticket = ticket;
-                  ticketElement.render();
-                  if (message.isClosed) {
-                    self.ticketElementList.splice(ticketElementIndex, 1);
-                    self.ticketList.removeChild(ticketElement.element);
-                  }
-                }
-
-                // show notification
-                if (!self.active) {
-                  if (SendBirdDesk.isDeskChannel(channel)) {
-                    if (MessageElement.isVisible(message)) {
-                      const notification = new NotificationElement(ticket, message);
-                      notification.render();
-                      notification.onClick(ticket => {
-                        notification.close();
-                        self.payloadTicket = ticket;
-                        self.action.click();
-                      });
-                      notification.open(this);
+              message.isClosureInquired =
+                data && data.type === SendBirdDesk.Message.DataType.TICKET_INQUIRE_CLOSURE;
+              if (message.isClosureInquired) {
+                const closureInquiry = data.body;
+                switch (closureInquiry.state) {
+                  case SendBirdDesk.Message.ClosureState.CONFIRMED:
+                    ticket.status = SendBirdDesk.Ticket.Status.CLOSED;
+                    if (ticketElement) {
+                      self.ticketElementList.splice(ticketElementIndex, 1);
+                      self.ticketList.removeChild(ticketElement.element);
                     }
-                  }
-                }
-              });
-              if (self.dialog && self.dialog.isOpened) {
-                if (self.dialog.ticket.channel.url === channel.url) {
-                  if (MessageElement.isVisible(message)) {
-                    self.dialog.appendMessage(message);
-                  }
-                  self.dialog.ticket.channel.markAsRead(() => {});
+                    break;
                 }
               }
-            }
-          };
-          channelHandler.onMessageUpdated = (channel, message) => {
-            if (self.currentTab === SendBirdDesk.Ticket.Status.OPEN) {
-              SendBirdDesk.Ticket.getByChannelUrl(channel.url, (res, err) => {
-                if (err) throw err;
-                const ticket = res;
-                let data = null;
-                try {
-                  data = message.data ? JSON.parse(message.data) : null;
-                } catch (e) {
-                  throw e;
-                }
-                if (data && data.ticket) ticket.status = data.ticket.status;
-
-                let ticketElementIndex = self.ticketElementList.findIndex(
-                  ticketElement => ticketElement.ticket.id === ticket.id
-                );
-                let ticketElement = ticketElementIndex >= 0 ? self.ticketElementList[ticketElementIndex] : null;
-
-                message.isClosureInquired =
-                  data && data.type === SendBirdDesk.Message.DataType.TICKET_INQUIRE_CLOSURE;
-                if (message.isClosureInquired) {
-                  const closureInquiry = data.body;
-                  switch (closureInquiry.state) {
-                    case SendBirdDesk.Message.ClosureState.CONFIRMED:
-                      ticket.status = SendBirdDesk.Ticket.Status.CLOSED;
-                      if (ticketElement) {
-                        self.ticketElementList.splice(ticketElementIndex, 1);
-                        self.ticketList.removeChild(ticketElement.element);
-                      }
-                      break;
+              if (self.dialog && self.dialog.isOpened) {
+                if (self.dialog.ticket.channel.url === channel.url) {
+                  self.dialog.updateMessage(message);
+                  if (ticket.status === SendBirdDesk.Ticket.Status.CLOSED) {
+                    self.dialog.disableForm();
                   }
                 }
-                if (self.dialog && self.dialog.isOpened) {
-                  if (self.dialog.ticket.channel.url === channel.url) {
-                    self.dialog.updateMessage(message);
-                    if (ticket.status === SendBirdDesk.Ticket.Status.CLOSED) {
-                      self.dialog.disableForm();
-                    }
-                  }
-                }
-              });
-            }
+              }
+            });
           };
           self.sendbird.groupChannel.addGroupChannelHandler('widget', channelHandler);
         }
