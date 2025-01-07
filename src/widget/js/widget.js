@@ -46,7 +46,6 @@ export default class Widget {
 
     this.ticketRevision = 0;
     this.isLoading = false;
-    this.noMoreTicket = false;
 
     let ticketNew = simplify(document.querySelector('.-sbd-ticket-list > .-sbd-ticket-new'));
     ticketNew.on('click', () => {
