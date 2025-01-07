@@ -86,27 +86,6 @@ body {
       background: $color-white;
       @include box-shadow(0 5px 40px 0 rgba(0, 0, 0, 0.15));
 
-      .-sbd-header {
-        position: relative;
-        width: 100%;
-        height: 15%;
-        min-height: 85px;
-        color: $color-white;
-        background: $color-theme-default;
-        overflow: visible;
-
-        .-sbd-title {
-          display: inline-block;
-          position: absolute;
-          left: 24px;
-          bottom: 10px;
-          text-align: center;
-          font-size: 28px;
-          font-weight: 600;
-          letter-spacing: -0.8px;
-        }
-
-      }
       .-sbd-error {
         position: absolute;
         left: 0;
@@ -140,53 +119,9 @@ body {
           transition: all 500ms;
         }
 
-        .-sbd-dialog-header {
-          position: relative;
-          width: 100%;
-          height: 15%;
-          min-height: 85px;
-          color: $color-white;
-          background: $color-theme-default;
-
-          .close {
-            position: absolute;
-            left: 20px;
-            top: 30px;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            @include icon($ic-back, 15px 11px);
-            @include border-radius(2px);
-            @include hover-focus {
-              background-color: #5d44ce;
-            }
-          }
-          .agent {
-            width: 100%;
-            text-align: center;
-
-            .profile {
-              display: inline-block;
-              width: 40px;
-              height: 40px;
-              margin-top: 12px;
-              @include icon($ic-profile, 40px 40px);
-
-              .image {
-                width: 100%;
-                height: 100%;
-                @include border-radius(50%);
-              }
-            }
-            .name {
-              font-size: 13px;
-              color: $color-white;
-            }
-          }
-        }
         .-sbd-message-list {
           position: relative;
-          height: 76%;
+          height: 91%;
           background: $color-white;
           padding-bottom: 10px;
           overflow: auto;

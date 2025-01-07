@@ -7,7 +7,6 @@ import { MessageCollectionInitPolicy, MessageFilter } from '@sendbird/chat/group
 
 const MESSAGE_LIMIT = 20;
 const RECENT_MESSAGE_THRESHOLD = 60; // sec
-const DEFAULT_AGENT = 'Agent';
 const DEFAULT_PLACEHOLDER = 'Write a message...';
 const DEFAULT_PLACEHOLDER_DISABLED = '';
 
@@ -15,14 +14,6 @@ export default class Dialog {
   constructor(ticket) {
     this.ticket = ticket;
     this.element = parseDom(`<div class='-sbd-dialog'>
-            <div class='-sbd-dialog-header'>
-                <div class='agent'>
-                    <div class='profile'>
-                        <img src='' alt='Profile' class='image'></img>
-                    </div>
-                    <div class='name'>${this.ticket.agent ? this.ticket.agent.name : DEFAULT_AGENT}</div>
-                </div>
-            </div>
             <div class='-sbd-message-list'>
             </div>
             <div class='-custom-suggested-question-list'>
@@ -35,7 +26,6 @@ export default class Dialog {
                 <input type='text' class='message' placeholder='${DEFAULT_PLACEHOLDER}'></input>
             </div>
         </div>`);
-    this.updateAgent(ticket.agent);
     this.isOpened = false;
 
     this.messageList = simplify(this.element.querySelector('.-sbd-message-list'));
@@ -232,23 +222,6 @@ export default class Dialog {
     this.form.addClass('disabled');
     this.input.attr('readonly', 'readonly');
     this.input.attr('placeholder', DEFAULT_PLACEHOLDER_DISABLED);
-  }
-  updateAgent(agent) {
-    if (this.ticket) this.ticket.agent = agent;
-    let profileImage = simplify(this.element.querySelector('.agent .profile .image'));
-    let agentName = simplify(this.element.querySelector('.agent .name'));
-    if (agent) {
-      if (agent.profileUrl) {
-        profileImage.attr('src', agent.profileUrl);
-        profileImage.show();
-      } else {
-        profileImage.hide();
-      }
-      agentName.html(agent.name || DEFAULT_AGENT);
-    } else {
-      profileImage.hide();
-      agentName.html(DEFAULT_AGENT);
-    }
   }
   isMessageStreak(recent, adjacent) {
     return (
