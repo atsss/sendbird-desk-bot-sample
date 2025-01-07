@@ -140,6 +140,31 @@ export default class Dialog {
         }
       }
     });
+
+    // Customize for suggested questions
+    this.options.forEach(option => {
+      option.on('click', e => {
+        this.optionList.fadeOut();
+        console.log(e.target, e.target.innerText)
+        if (this.ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED) {
+          this.ticket.status = SendBirdDesk.Ticket.Status.UNASSIGNED;
+        }
+        const message = {
+          message: e.target.innerText,
+        };
+        this.ticket.channel
+          .sendUserMessage(message)
+          // .onPending((message) => {
+          // })
+          .onSucceeded((message) => {
+            this.appendMessage(message);
+            this.scrollToBottom();
+          })
+          .onFailed((error, message) => {
+            this.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
+          });
+      })
+    })
   }
   loadMessage(next, callback) {
     if (!this.query || !next) {
