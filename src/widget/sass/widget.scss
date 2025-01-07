@@ -50,6 +50,8 @@ body {
   background: #fff;
 
   .-custom-suggested-question-list {
+    position: fixed;
+    bottom: 10%;
     padding: 4px;
 
     .-custom-options {
@@ -259,7 +261,7 @@ body {
       .-sbd-header {
         position: relative;
         width: 100%;
-        height: 84px;
+        height: 15%;
         color: $color-white;
         background: $color-theme-default;
         overflow: visible;
@@ -512,7 +514,7 @@ body {
         .-sbd-dialog-header {
           position: relative;
           width: 100%;
-          height: 84px;
+          height: 15%;
           color: $color-white;
           background: $color-theme-default;
 
@@ -554,7 +556,7 @@ body {
         }
         .-sbd-message-list {
           position: relative;
-          height: 438px;
+          height: 76%;
           background: $color-white;
           padding-bottom: 10px;
           overflow: auto;
@@ -874,7 +876,7 @@ body {
         .-sbd-message-form {
           position: absolute;
           width: 100%;
-          height: 58px;
+          height: 9%;
           bottom: 0;
           border-top: 1px #ddd solid;
           background: $color-white;
