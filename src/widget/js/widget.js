@@ -184,22 +184,6 @@ export default class Widget {
               if (message.isAssigned || message.isTransferred) {
                 ticket.agent = data.ticket.agent;
               }
-
-              // show notification
-              if (!self.active) {
-                if (SendBirdDesk.isDeskChannel(channel)) {
-                  if (MessageElement.isVisible(message)) {
-                    const notification = new NotificationElement(ticket, message);
-                    notification.render();
-                    notification.onClick(ticket => {
-                      notification.close();
-                      self.payloadTicket = ticket;
-                      self.action.click();
-                    });
-                    notification.open(this);
-                  }
-                }
-              }
             });
             if (self.dialog && self.dialog.isOpened) {
               if (self.dialog.ticket.channel.url === channel.url) {
