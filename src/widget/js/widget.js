@@ -67,7 +67,6 @@ export default class Widget {
 
     /** SendBird Desk Widget action button
      */
-    const guideBalloon = simplify(document.querySelector('.guide-balloon'));
     this.active = false;
     this.action = parseDom(`<div class='-sbd-action-button'></div>`);
     this.action.on('click', () => {
@@ -78,13 +77,6 @@ export default class Widget {
         setTimeout(() => {
           this.dialog.close(true);
         }, 500);
-      }
-
-      /// guide balloon toggle
-      if (this.active) {
-        guideBalloon.hide();
-      } else {
-        guideBalloon.show();
       }
     });
     this.action.hide();
@@ -122,7 +114,6 @@ export default class Widget {
         user.userId,
         // accessToken,
         () => {
-          guideBalloon.fadeIn(300);
           self.action.show();
           /// connection event handler
           const connectionHandler = new ConnectionHandler();
@@ -326,6 +317,7 @@ export default class Widget {
     }
     init();
   }
+
   loadTicket(status, offset, callback) {
     switch (status) {
       case SendBirdDesk.Ticket.Status.OPEN:
