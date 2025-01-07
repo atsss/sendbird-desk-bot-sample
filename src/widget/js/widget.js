@@ -228,47 +228,6 @@ export default class Widget {
               }
             }
           };
-          channelHandler.onMessageUpdated = (channel, message) => {
-            SendBirdDesk.Ticket.getByChannelUrl(channel.url, (res, err) => {
-              if (err) throw err;
-              const ticket = res;
-              let data = null;
-              try {
-                data = message.data ? JSON.parse(message.data) : null;
-              } catch (e) {
-                throw e;
-              }
-              if (data && data.ticket) ticket.status = data.ticket.status;
-
-              let ticketElementIndex = self.ticketElementList.findIndex(
-                ticketElement => ticketElement.ticket.id === ticket.id
-              );
-              let ticketElement = ticketElementIndex >= 0 ? self.ticketElementList[ticketElementIndex] : null;
-
-              message.isClosureInquired =
-                data && data.type === SendBirdDesk.Message.DataType.TICKET_INQUIRE_CLOSURE;
-              if (message.isClosureInquired) {
-                const closureInquiry = data.body;
-                switch (closureInquiry.state) {
-                  case SendBirdDesk.Message.ClosureState.CONFIRMED:
-                    ticket.status = SendBirdDesk.Ticket.Status.CLOSED;
-                    if (ticketElement) {
-                      self.ticketElementList.splice(ticketElementIndex, 1);
-                      self.ticketList.removeChild(ticketElement.element);
-                    }
-                    break;
-                }
-              }
-              if (self.dialog && self.dialog.isOpened) {
-                if (self.dialog.ticket.channel.url === channel.url) {
-                  self.dialog.updateMessage(message);
-                  if (ticket.status === SendBirdDesk.Ticket.Status.CLOSED) {
-                    self.dialog.disableForm();
-                  }
-                }
-              }
-            });
-          };
           self.sendbird.groupChannel.addGroupChannelHandler('widget', channelHandler);
         }
       );
