@@ -350,18 +350,7 @@ export default class Widget {
         callback(null, []);
     }
   }
-  appendTicket(ticket) {
-    const widgetTicket = new TicketElement(this, ticket);
-    this.ticketElementList.push(widgetTicket);
-    this.ticketList.appendChild(widgetTicket.element);
-  }
-  clearTicket() {
-    this.ticketElementList = [];
-    this.ticketList.removeAll('-sbd-ticket-item');
-  }
-  isBottom() {
-    return this.ticketList.scrollHeight - this.ticketList.scrollTop === this.ticketList.clientHeight;
-  }
+
   startNewDialog(ticket) {
     this.dialog = new Dialog(ticket);
     this.dialog.open(this);
