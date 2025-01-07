@@ -30,10 +30,6 @@ export default class Widget {
     Widget.panel = this.panel = parseDom(`<div class='-sbd-panel'>
             <div class='-sbd-header'>
                 <div class='-sbd-title'>Inbox</div>
-                <div class='-sbd-menu'><div class='icon'></div></div>
-                <div class='-sbd-menu-list'>
-                  <div class='-sbd-menu-item' data-cmd='signout'>Sign out</div>
-                </div>
             </div>
             <div class='-sbd-ticket-list'>
                 <div class='-sbd-ticket-new'>
@@ -45,23 +41,6 @@ export default class Widget {
         </div>`);
     this.element.appendChild(this.panel);
     this.error = simplify(this.element.querySelector('.-sbd-error'));
-
-    let menu = simplify(document.querySelector('.-sbd-menu'));
-    let menuList = simplify(document.querySelector('.-sbd-menu-list'));
-    menu.on('click', () => menuList.toggleClass('fade-in'));
-
-    let menus = simplify(document.querySelectorAll('.-sbd-menu-list > .-sbd-menu-item'));
-    for (let i = 0; i < menus.length; i++) {
-      menus[i].on('click', e => {
-        let cmd = e.target.getAttribute('data-cmd');
-        switch (cmd) {
-          case 'signout':
-            this.signout();
-            break;
-        }
-        menuList.toggleClass('fade-in');
-      });
-    }
 
     this.ticketList = simplify(document.querySelector('.-sbd-panel > .-sbd-ticket-list'));
     this.ticketElementList = [];
@@ -379,18 +358,6 @@ export default class Widget {
   clearTicket() {
     this.ticketElementList = [];
     this.ticketList.removeAll('-sbd-ticket-item');
-  }
-  signout() {
-    this.sendbird.disconnect().then(() => {
-      Broadcast.send('signout');
-      if (this.panel.hasClass('fade-in')) {
-        this.panel.toggleClass('fade-in');
-        setTimeout(() => {
-          this.element.removeChild(this.panel);
-        }, 250);
-      }
-      this.element.removeChild(this.action);
-    });
   }
   isBottom() {
     return this.ticketList.scrollHeight - this.ticketList.scrollTop === this.ticketList.clientHeight;
