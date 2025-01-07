@@ -49,6 +49,26 @@ body {
   font-weight: $font-weight-default;
   background: #fff;
 
+  .-custom-suggested-question-list {
+    padding: 4px;
+
+    .-custom-options {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex ;
+      overflow-x: scroll;
+      scrollbar-width: none;
+
+      .-custom-option {
+        flex: none;
+        padding: 2px 8px;
+        border: 1px solid gray;
+        border-radius: 10px;
+        margin-right: 4px;
+      }
+    }
+  }
   .guide {
     margin-top: 360px;
     text-align: center;
@@ -213,7 +233,7 @@ body {
     }
     .-sbd-panel {
       width: 370px;
-      height: 590px;
+      height: 630px;
       position: absolute;
       right: 0;
       bottom: 75px;
@@ -472,7 +492,7 @@ body {
         left: 100%;
         top: 0;
         width: 370px;
-        height: 590px;
+        height: 630px;
         background: $color-white;
         opacity: 0;
         visibility: hidden;

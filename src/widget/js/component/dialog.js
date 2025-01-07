@@ -26,6 +26,12 @@ export default class Dialog {
             </div>
             <div class='-sbd-message-list'>
             </div>
+            <div class='-custom-suggested-question-list'>
+              <ul class='-custom-options'>
+                <li class='-custom-option'>What's Moment?</li>
+                <li class='-custom-option'>How much is Moment for a month?</li>
+              </ul>
+            </div>
             <div class='-sbd-message-form'>
                 <input type='text' class='message' placeholder='${DEFAULT_PLACEHOLDER}'></input>
                 <div class='attach'><input type='file' class='file'></input></div>
@@ -75,6 +81,9 @@ export default class Dialog {
     this.attach = simplify(this.form.querySelector('.attach'));
     this.file = simplify(this.form.querySelector('.file'));
     this.editable = true;
+    // Customize for suggested questions
+    this.optionList = simplify(this.element.querySelector('.-custom-suggested-question-list'));
+    this.options = simplify(this.element.querySelectorAll('.-custom-option'));
 
     if (ticket.status === SendBirdDesk.Ticket.Status.CLOSED) {
       this.disableForm();
@@ -85,6 +94,8 @@ export default class Dialog {
         e.preventDefault();
         const text = this.input.val();
         this.input.val('');
+
+        this.optionList.fadeOut();
 
         if (text && this.editable) {
           if (this.ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED) {
@@ -165,6 +176,33 @@ export default class Dialog {
       }
     });
     this.file.on('click', e => e.stopPropagation());
+
+    // Customize for suggested questions
+    this.options.forEach(option => {
+      option.on('click', e => {
+        this.optionList.fadeOut();
+
+        console.log(e.target, e.target.innerText)
+
+        if (this.ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED) {
+          this.ticket.status = SendBirdDesk.Ticket.Status.UNASSIGNED;
+        }
+        const message = {
+          message: e.target.innerText,
+        };
+        this.ticket.channel
+          .sendUserMessage(message)
+          // .onPending((message) => {
+          // })
+          .onSucceeded((message) => {
+            this.appendMessage(message);
+            this.scrollToBottom();
+          })
+          .onFailed((error, message) => {
+            this.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
+          });
+      })
+    })
   }
   loadMessage(next, callback) {
     if (!this.query || !next) {
