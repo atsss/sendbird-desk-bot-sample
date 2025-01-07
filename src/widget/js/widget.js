@@ -235,31 +235,6 @@ export default class Widget {
     init();
   }
 
-  loadTicket(status, offset, callback) {
-    switch (status) {
-      case SendBirdDesk.Ticket.Status.OPEN:
-        SendBirdDesk.Ticket.getOpenedList(offset, (res, err) => {
-          if (err) throw err;
-          const tickets = res;
-          this.noMoreTicket = tickets.length < SendBirdDesk.Ticket.defaultLimit;
-          callback(res, err);
-        });
-        break;
-
-      case SendBirdDesk.Ticket.Status.CLOSED:
-        SendBirdDesk.Ticket.getClosedList(offset, (res, err) => {
-          if (err) throw err;
-          const tickets = res;
-          this.noMoreTicket = tickets.length < SendBirdDesk.Ticket.defaultLimit;
-          callback(res, err);
-        });
-        break;
-
-      default:
-        callback(null, []);
-    }
-  }
-
   startNewDialog(ticket) {
     this.dialog = new Dialog(ticket);
     this.dialog.open(this);
