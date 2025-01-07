@@ -194,12 +194,6 @@ export default class Widget {
       modules: [new GroupChannelModule()],
     }
 
-    if (options.wsHost) {
-      params.wsHost = options.wsHost;
-    }
-    if (options.apiHost) {
-      params.apiHost = options.apiHost;
-    }
     this.sendbird = SendBird.init(params);
     setSb(this.sendbird);
     // I use self here to pass `this` inside the async function
@@ -216,9 +210,6 @@ export default class Widget {
       }
       if (DEBUG) SendBirdDesk.setDebugMode();
       SendBirdDesk.init(self.sendbird);
-      if (options.deskApiHost) {
-        SendBirdDesk.setApiHost(options.deskApiHost);
-      }
       SendBirdDesk.authenticate(
         user.userId,
         // accessToken,
