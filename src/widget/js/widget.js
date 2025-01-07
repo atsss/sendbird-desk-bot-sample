@@ -54,8 +54,6 @@ export default class Widget {
     });
 
     this.spinner = new Spinner();
-    this.currentPage = 0;
-    this.payloadTicket = null;
 
     /** SendBird SDK and SendBird Desk SDK init
      *  NOTICE!
