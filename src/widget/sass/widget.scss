@@ -136,7 +136,7 @@ body {
     height: 60px;
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    right: 0;
     -webkit-font-smoothing: antialiased;
 
     .-sbd-action-button {
@@ -234,7 +234,7 @@ body {
       }
     }
     .-sbd-panel {
-      width: 90vw;
+      width: 100vw;
       height: 75vh;
       position: absolute;
       right: 0;
@@ -494,7 +494,7 @@ body {
         position: absolute;
         left: 100%;
         top: 0;
-        width: 90vw;
+        width: 100vw;
         height: 75vh;
         background: $color-white;
         opacity: 0;
