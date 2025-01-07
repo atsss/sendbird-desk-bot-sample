@@ -41,9 +41,6 @@ export default class Widget {
 
     this.ticketList = simplify(document.querySelector('.-sbd-panel > .-sbd-ticket-list'));
 
-    this.ticketRevision = 0;
-    this.isLoading = false;
-
     let ticketNew = simplify(document.querySelector('.-sbd-ticket-list > .-sbd-ticket-new'));
     ticketNew.on('click', () => {
       const ticketNum = ('000' + (new Date().getTime() % 1000)).slice(-3);
