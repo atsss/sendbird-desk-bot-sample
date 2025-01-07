@@ -136,7 +136,7 @@ body {
     height: 60px;
     position: fixed;
     bottom: 20px;
-    right: 0;
+    right: 20px;
     -webkit-font-smoothing: antialiased;
 
     .-sbd-action-button {
@@ -234,7 +234,7 @@ body {
       }
     }
     .-sbd-panel {
-      width: 100vw;
+      width: 90vw;
       height: 75vh;
       position: absolute;
       right: 0;
@@ -494,7 +494,7 @@ body {
         position: absolute;
         left: 100%;
         top: 0;
-        width: 100vw;
+        width: 90vw;
         height: 75vh;
         background: $color-white;
         opacity: 0;
@@ -896,8 +896,8 @@ body {
             }
           }
           .message {
-            padding: 18px 62px 17px 20px;
-            width: 290px;
+            padding: 18px 20px;
+            width: 80vw;
             font-size: 0.9em;
             min-height: 25px;
             max-height: 88px;

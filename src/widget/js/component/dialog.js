@@ -34,7 +34,6 @@ export default class Dialog {
             </div>
             <div class='-sbd-message-form'>
                 <input type='text' class='message' placeholder='${DEFAULT_PLACEHOLDER}'></input>
-                <div class='attach'><input type='file' class='file'></input></div>
             </div>
         </div>`);
     this.updateAgent(ticket.agent);
@@ -78,8 +77,6 @@ export default class Dialog {
 
     this.form = simplify(this.element.querySelector('.-sbd-message-form'));
     this.input = simplify(this.form.querySelector('.message'));
-    this.attach = simplify(this.form.querySelector('.attach'));
-    this.file = simplify(this.form.querySelector('.file'));
     this.editable = true;
     // Customize for suggested questions
     this.optionList = simplify(this.element.querySelector('.-custom-suggested-question-list'));
@@ -143,66 +140,6 @@ export default class Dialog {
         }
       }
     });
-    this.attach.on('click', () => {
-      if (this.editable) {
-        this.file.click();
-      }
-    });
-    this.file.on('change', () => {
-      if (this.editable) {
-        const selectedFile = this.file.files[0];
-        const fileMessage = {
-          file: selectedFile,
-          fileName: selectedFile.name,
-          fileSize: selectedFile.size,
-          mimeType: selectedFile.type,
-          thumbnailSizes: [{ maxWidth: 220, maxHeight: 220 }],
-        };
-        this.ticket.channel.sendFileMessage(fileMessage)
-          .onPending((message) => {
-            // show progress
-          })
-          .onFailed((error, message) => {
-            // hide progress
-            console.log(error);
-          })
-          .onSucceeded((res) => {
-            if (MessageElement.isVisible(res)) {
-              // hide progress
-              this.appendMessage(res);
-              this.scrollToBottom();
-            }
-          });
-      }
-    });
-    this.file.on('click', e => e.stopPropagation());
-
-    // Customize for suggested questions
-    this.options.forEach(option => {
-      option.on('click', e => {
-        this.optionList.fadeOut();
-
-        console.log(e.target, e.target.innerText)
-
-        if (this.ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED) {
-          this.ticket.status = SendBirdDesk.Ticket.Status.UNASSIGNED;
-        }
-        const message = {
-          message: e.target.innerText,
-        };
-        this.ticket.channel
-          .sendUserMessage(message)
-          // .onPending((message) => {
-          // })
-          .onSucceeded((message) => {
-            this.appendMessage(message);
-            this.scrollToBottom();
-          })
-          .onFailed((error, message) => {
-            this.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
-          });
-      })
-    })
   }
   loadMessage(next, callback) {
     if (!this.query || !next) {
@@ -286,14 +223,12 @@ export default class Dialog {
     this.form.removeClass('disabled');
     this.input.attr('readonly', '');
     this.input.attr('placeholder', DEFAULT_PLACEHOLDER);
-    this.attach.show();
   }
   disableForm() {
     this.editable = false;
     this.form.addClass('disabled');
     this.input.attr('readonly', 'readonly');
     this.input.attr('placeholder', DEFAULT_PLACEHOLDER_DISABLED);
-    this.attach.hide();
   }
   updateAgent(agent) {
     if (this.ticket) this.ticket.agent = agent;
