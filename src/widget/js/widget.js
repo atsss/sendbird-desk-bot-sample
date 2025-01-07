@@ -59,20 +59,7 @@ export default class Widget {
 
     /** SendBird Desk Widget action button
      */
-    this.active = false;
-    this.action = parseDom(`<div class='-sbd-action-button'></div>`);
-    this.action.on('click', () => {
-      this.active = !this.active;
-      this.action.toggleClass('is-active');
-      this.panel.toggleClass('fade-in');
-      if (!this.active && this.dialog) {
-        setTimeout(() => {
-          this.dialog.close(true);
-        }, 500);
-      }
-    });
-    this.action.hide();
-    this.element.appendChild(this.action);
+    this.panel.toggleClass('fade-in');
 
     /** SendBird SDK and SendBird Desk SDK init
      *  NOTICE!
@@ -106,50 +93,45 @@ export default class Widget {
         user.userId,
         // accessToken,
         () => {
-          self.action.show();
           /// connection event handler
           const connectionHandler = new ConnectionHandler();
           connectionHandler.onReconnectStarted = () => {
-            if (self.active) self.spinner.attachTo(self.ticketList);
+            self.spinner.attachTo(self.ticketList);
           };
           connectionHandler.onReconnectSucceeded = () => {
-            if (self.active) {
-              self.error.hide();
+            self.error.hide();
 
-              if (self.dialog && self.dialog.isOpened) {
-                self.dialog.ticket.channel.markAsRead();
-                self.dialog.ticket.refresh((res, err) => {
-                  if (!err) {
-                    self.dialog.ticket = res;
-                    self.dialog.updateAgent(res.agent);
-                  }
-                });
-                const lastRevision = self.dialog.messageRevision;
-                self.dialog.loadMessage(false, (res, err) => {
-                  if (!err) {
-                    if (self.dialog.messageRevision === lastRevision) {
-                      const messages = res;
-                      for (let i in messages) {
-                        const message = messages[i];
-                        if (MessageElement.isVisible(message)) {
-                          self.dialog.prependMessage(message);
-                        }
+            if (self.dialog && self.dialog.isOpened) {
+              self.dialog.ticket.channel.markAsRead();
+              self.dialog.ticket.refresh((res, err) => {
+                if (!err) {
+                  self.dialog.ticket = res;
+                  self.dialog.updateAgent(res.agent);
+                }
+              });
+              const lastRevision = self.dialog.messageRevision;
+              self.dialog.loadMessage(false, (res, err) => {
+                if (!err) {
+                  if (self.dialog.messageRevision === lastRevision) {
+                    const messages = res;
+                    for (let i in messages) {
+                      const message = messages[i];
+                      if (MessageElement.isVisible(message)) {
+                        self.dialog.prependMessage(message);
                       }
-                      self.dialog.scrollToBottom();
                     }
-                    self.spinner.detach();
+                    self.dialog.scrollToBottom();
                   }
-                });
-              } else {
-                self.spinner.detach();
-              }
+                  self.spinner.detach();
+                }
+              });
+            } else {
+              self.spinner.detach();
             }
           };
           connectionHandler.onReconnectFailed = () => {
-            if (self.active) {
-              self.spinner.detach();
-              self.error.show();
-            }
+            self.spinner.detach();
+            self.error.show();
           };
           self.sendbird.addConnectionHandler('widget', connectionHandler);
 
