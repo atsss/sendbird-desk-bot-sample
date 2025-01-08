@@ -143,7 +143,7 @@ export default class Widget {
 
           // Start new channel or existing channel
           const ticketNum = ('000' + (new Date().getTime() % 1000)).slice(-3);
-          const tempTicketTitle = `Issue #${ticketNum}`;
+          const tempTicketTitle = `JP - Development Issue #${ticketNum}`;
           SendBirdDesk.Ticket.create(tempTicketTitle, user.nickname, (ticket, err) => {
             if (err) throw err;
             self.startNewDialog(ticket);
