@@ -78,7 +78,7 @@ export default class Dialog {
       const text = this.input.val();
       this.input.val('');
 
-      this.optionList.fadeOut();
+      this.optionList.hide();
 
       if (text && this.editable) {
         if (this.ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED) {
@@ -129,7 +129,7 @@ export default class Dialog {
     // Customize for suggested questions
     this.options.forEach(option => {
       option.on('click', e => {
-        this.optionList.fadeOut();
+        this.optionList.hide();
         console.log(e.target, e.target.innerText)
         if (this.ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED) {
           this.ticket.status = SendBirdDesk.Ticket.Status.UNASSIGNED;
