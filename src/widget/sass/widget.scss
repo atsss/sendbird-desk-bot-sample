@@ -69,7 +69,9 @@ body {
         padding: 2px 8px;
         border: 1px solid gray;
         border-radius: 10px;
-        margin: 8px 6px;
+        margin: 6px;
+        background-color: white;
+        font-size: 0.8rem
       }
     }
   }
@@ -297,7 +299,7 @@ body {
           }
           .message {
             padding: 12px 16px;
-            flex-basis: 92%;
+            flex-basis: 88%;
             font-size: 1.1em;
             min-height: 25px;
             max-height: 88px;
@@ -314,7 +316,7 @@ body {
           }
           .button {
             font-weight: bold;
-            flex-basis: 8%;
+            flex-basis: 12%;
             border-radius: 12px;
             background-color: #007bff;
             color: white;
