@@ -140,20 +140,20 @@ export default class Widget {
             }
 
             // Send message from query parameter after receiving the first message
-            const FIRST_MESSAGE_TEXT = "はじめまして！Moment について詳しく聞きたいことがあったら質問してください。"
-            const params = new URL(location.href).searchParams;
-            if (self.dialog && message.message === FIRST_MESSAGE_TEXT && params.get('q')) {
-              console.log(params.get('q'), self.dialog)
-              self.dialog.ticket.channel
-                .sendUserMessage({ message: params.get('q') })
-                .onSucceeded((queryMessage) => {
-                  self.dialog.appendMessage(queryMessage);
-                  self.dialog.scrollToBottom();
-                })
-                .onFailed((error, message) => {
-                  self.dialog.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
-                });
-            }
+            // const FIRST_MESSAGE_TEXT = "はじめまして！Moment について詳しく聞きたいことがあったら質問してください。"
+            // const params = new URL(location.href).searchParams;
+            // if (self.dialog && message.message === FIRST_MESSAGE_TEXT && params.get('q')) {
+            //   console.log(params.get('q'), self.dialog)
+            //   self.dialog.ticket.channel
+            //     .sendUserMessage({ message: params.get('q') })
+            //     .onSucceeded((queryMessage) => {
+            //       self.dialog.appendMessage(queryMessage);
+            //       self.dialog.scrollToBottom();
+            //     })
+            //     .onFailed((error, message) => {
+            //       self.dialog.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
+            //     });
+            // }
           };
           self.sendbird.groupChannel.addGroupChannelHandler('widget', channelHandler);
 
