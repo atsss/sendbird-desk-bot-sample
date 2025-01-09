@@ -7,7 +7,7 @@ import { MessageCollectionInitPolicy, MessageFilter } from '@sendbird/chat/group
 
 const MESSAGE_LIMIT = 20;
 const RECENT_MESSAGE_THRESHOLD = 60; // sec
-const DEFAULT_PLACEHOLDER = 'Write a message...';
+const DEFAULT_PLACEHOLDER = 'メッセージを入力';
 const DEFAULT_PLACEHOLDER_DISABLED = '';
 
 export default class Dialog {
@@ -23,8 +23,12 @@ export default class Dialog {
               </ul>
             </div>
             <form class="-sbd-message-form">
-                <textarea class="message" placeholder="${DEFAULT_PLACEHOLDER}" maxlength="500" rows="1"></textarea>
-                <button class="button">Submit</button>
+              <textarea class="message" placeholder="${DEFAULT_PLACEHOLDER}" maxlength="500" rows="1"></textarea>
+              <button class="button">
+                <svg class="send-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
+                </svg>
+              </button>
             </form>
         </div>`);
     this.isOpened = false;
