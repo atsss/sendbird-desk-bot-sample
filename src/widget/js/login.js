@@ -17,8 +17,7 @@ export default class Login {
     if (caching) {
       user.appId = localStorage.getItem(LOGIN_CACHE_KEY_APP_ID) || SENDBIRD_APP_ID;
       user.userId = localStorage.getItem(LOGIN_CACHE_KEY_USER_ID) || Date.now().toString();
-      user.nickname = localStorage.getItem(LOGIN_CACHE_KEY_NICKNAME) || Date.now().toString();
-      console.log('Cached:', localStorage)
+      user.nickname = localStorage.getItem(LOGIN_CACHE_KEY_NICKNAME) || this.cmputeUserName();
     }
 
     if (user.appId && user.userId && user.nickname) {
@@ -32,6 +31,37 @@ export default class Login {
     } else {
       console.error('Missing information to login');
     };
+  }
+  cmputeUserName() {
+    let userName = '';
+    const params = new URL(location.href).searchParams;
+
+    if (params && params.get('country')) {
+      switch (params.get('country')) {
+        case 'jp':
+          userName += 'JP';
+          break
+        default:
+          console.log('No country code')
+      }
+    }
+
+    if (params && params.get('media')) {
+      switch (params.get('media')) {
+        case 'email':
+          userName += 'Email';
+          break
+        case 'google_ad':
+          userName += 'GoogleAd';
+          break
+        default:
+          console.log('No media')
+      }
+    }
+
+    userName += Date.now().toString();
+
+    return userName;
   }
 }
 window.onload = () => {
