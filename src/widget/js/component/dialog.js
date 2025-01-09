@@ -18,8 +18,11 @@ export default class Dialog {
             </div>
             <div class='-custom-suggested-question-list'>
               <ul class='-custom-options'>
-                <li class='-custom-option'>What's Moment?</li>
-                <li class='-custom-option'>How much is Moment for a month?</li>
+                <li class='-custom-option'>料理は自由に選べるの？</li>
+                <li class='-custom-option'>どのくらいうまくなる？</li>
+                <li class='-custom-option'>カメラはずっと撮影してるの？</li>
+                <li class='-custom-option'>どんなチャーハンがつくれるようになる？</li>
+                <li class='-custom-option'>今忙しいから、時間ができたらやりたいかも</li>
               </ul>
             </div>
             <form class="-sbd-message-form">

@@ -59,6 +59,8 @@ body {
       margin: 0;
       padding: 0;
       display: flex ;
+      flex-wrap: wrap-reverse;
+      flex-direction: row-reverse;
       overflow-x: scroll;
       scrollbar-width: none;
 
@@ -67,7 +69,7 @@ body {
         padding: 2px 8px;
         border: 1px solid gray;
         border-radius: 10px;
-        margin-right: 4px;
+        margin: 8px 6px;
       }
     }
   }
