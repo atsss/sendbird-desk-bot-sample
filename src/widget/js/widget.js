@@ -158,8 +158,8 @@ export default class Widget {
           self.sendbird.groupChannel.addGroupChannelHandler('widget', channelHandler);
 
           // Start new channel or existing channel
-          const ticketNum = ('000' + (new Date().getTime() % 1000)).slice(-3);
-          const tempTicketTitle = `JP - Development Issue #${ticketNum}`;
+          const ticketNum = ('00000' + (new Date().getTime() % 10000)).slice(-5);
+          const tempTicketTitle = `JP - Dev Issue #${ticketNum}`;
           SendBirdDesk.Ticket.create(tempTicketTitle, user.nickname, (ticket, err) => {
             if (err) throw err;
             self.startNewDialog(ticket);
