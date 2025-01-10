@@ -16,16 +16,14 @@ export default class Login {
     };
     if (caching) {
       user.appId = localStorage.getItem(LOGIN_CACHE_KEY_APP_ID) || SENDBIRD_APP_ID;
-      user.userId = localStorage.getItem(LOGIN_CACHE_KEY_USER_ID) || Date.now().toString();
-      user.nickname = localStorage.getItem(LOGIN_CACHE_KEY_NICKNAME) || this.cmputeUserName();
+      user.userId = Date.now().toString();
+      user.nickname = this.cmputeUserName();
     }
 
     if (user.appId && user.userId && user.nickname) {
       const options = {};
       if (caching) {
         localStorage.setItem(LOGIN_CACHE_KEY_APP_ID, user.appId);
-        localStorage.setItem(LOGIN_CACHE_KEY_USER_ID, user.userId);
-        localStorage.setItem(LOGIN_CACHE_KEY_NICKNAME, user.nickname);
       }
       new Widget(user, options);
     } else {
