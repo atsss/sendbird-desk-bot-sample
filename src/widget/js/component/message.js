@@ -250,6 +250,23 @@ export default class MessageElement {
             window.open(this.message.url, '_blank');
           });
         }
+      } else if (SendBirdDesk.Message.UrlRegExp.test(this.message.message)) {
+        this.message.message = this.message.message.replace(
+          SendBirdDesk.Message.UrlRegExp,
+          url => `<a href='${url}'>${url}</a>`
+        );
+
+        this.messageFile.hide();
+        this.media.hide();
+        this.messageBox.show();
+        this.messageText.html(this.message.message);
+
+        const links = this.messageText.querySelectorAll('a');
+
+        links.forEach(link => {
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+        })
       } else {
         this.messageFile.hide();
         this.media.hide();
