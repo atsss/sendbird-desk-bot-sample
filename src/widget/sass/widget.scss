@@ -57,21 +57,23 @@ body {
     .-custom-options {
       list-style: none;
       margin: 0;
-      padding: 0;
+      padding: 12px;
       display: flex ;
-      flex-wrap: wrap-reverse;
-      flex-direction: row-reverse;
+      gap: 8px;
       overflow-x: scroll;
-      scrollbar-width: none;
 
       .-custom-option {
-        flex: none;
+        flex-basis: 120px;
         padding: 2px 8px;
-        border: 1px solid gray;
+        flex-shrink: 0;
+        border: 1px solid #1b1c1d;
         border-radius: 10px;
-        margin: 6px;
         background-color: white;
-        font-size: 0.8rem
+        font-size: 0.8rem;
+        color: #1b1c1d;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
       }
     }
   }
