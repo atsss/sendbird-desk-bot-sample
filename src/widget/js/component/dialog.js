@@ -19,11 +19,13 @@ export default class Dialog {
             <div class='-custom-suggested-question-list'>
               <ul class='-custom-options'>
                 <li class='-custom-option'>AIはどうやって私だけの改善点を見つけることができるの？</li>
-                <li class='-custom-option'>カメラの映像だけなのに味や火加減が分かるの？</li>
-                <li class='-custom-option'>料理中にアドバイスをもらえるの？</li>
+                <li class='-custom-option'>賃貸の家だけどカメラを取り付けるのに問題ない？</li>
+                <li class='-custom-option'>料理を上達するために何したら良いか分かってないけど、それでも大丈夫？</li>
                 <li class='-custom-option'>カメラはずっと撮影してるの？</li>
                 <li class='-custom-option'>チャーハンの場合にどんな感じでコーチングが進むのか教えて</li>
                 <li class='-custom-option'>月に何品でも好きなだけコーチングを受けられるの？</li>
+                <li class='-custom-option'>料理中にアドバイスをもらえるの？</li>
+                <li class='-custom-option'>カメラの映像だけなのに味や火加減が分かるの？</li>
               </ul>
             </div>
             <form class="-sbd-message-form">
