@@ -19,8 +19,9 @@ export default class Dialog {
             <div class='-custom-suggested-question-list'>
               <ul class='-custom-options'>
                 <li class='-custom-option'>月に何品でも好きなだけコーチングを受けられるの？</li>
-                <li class='-custom-option'>どんな料理でコーチングを受けられるか教えて</li>
                 <li class='-custom-option'>チャーハンでコーチングを受ける場合にどんな感じでコーチングが進むのか教えて</li>
+                <li class='-custom-option'>カメラはずっと撮影してるの？</li>
+                <li class='-custom-option'>料理中にアドバイスをもらえるの？</li>
                 <li class='-custom-option'>カメラの映像だけなのに味や火加減が分かるの？</li>
                 <li class='-custom-option'>AIはどうやって私だけの改善点を見つけることができるの？</li>
               </ul>
