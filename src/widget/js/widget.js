@@ -7,7 +7,7 @@ import { parseDom } from './domparser.js';
 
 import Dialog from './component/dialog.js';
 import MessageElement from './component/message.js';
-import ThinkingIndicator from './component/ThinkingIndicator.js';
+import ThinkingIndicator from './component/thinkingIndicator.js';
 import { setSb } from './globalStore.js';
 
 /** Default settings
