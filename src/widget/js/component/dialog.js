@@ -11,8 +11,10 @@ const DEFAULT_PLACEHOLDER = 'メッセージを入力';
 const DEFAULT_PLACEHOLDER_DISABLED = '';
 
 export default class Dialog {
-  constructor(ticket) {
+  constructor(ticket, thinkingIndicator) {
     this.ticket = ticket;
+    this.thinkingIndicator = thinkingIndicator;
+
     this.element = parseDom(`<div class='-sbd-dialog'>
             <div class='-sbd-message-list'>
             </div>
@@ -122,6 +124,7 @@ export default class Dialog {
               });
             }
             this.appendMessage(message);
+            this.thinkingIndicator.attachTo(this.messageList);
             this.scrollToBottom();
           })
           .onFailed((error, message) => {
@@ -147,6 +150,7 @@ export default class Dialog {
           // })
           .onSucceeded((message) => {
             this.appendMessage(message);
+            this.thinkingIndicator.attachTo(this.messageList);
             this.scrollToBottom();
           })
           .onFailed((error, message) => {

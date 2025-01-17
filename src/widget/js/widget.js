@@ -7,6 +7,7 @@ import { parseDom } from './domparser.js';
 
 import Dialog from './component/dialog.js';
 import MessageElement from './component/message.js';
+import ThinkingIndicator from './component/ThinkingIndicator.js';
 import { setSb } from './globalStore.js';
 
 /** Default settings
@@ -28,6 +29,8 @@ export default class Widget {
         </div>`);
     this.element.appendChild(this.panel);
     this.error = simplify(this.element.querySelector('.-sbd-error'));
+
+    this.thinkingIndicator = new ThinkingIndicator();
 
     /** SendBird SDK and SendBird Desk SDK init
      *  NOTICE!
@@ -104,6 +107,7 @@ export default class Widget {
           /// channel/message event handler
           const channelHandler  = new GroupChannelHandler();
           channelHandler.onMessageReceived = (channel, message) => {
+            self.thinkingIndicator.detach();
             let data = null;
             try {
               data = message.data ? JSON.parse(message.data) : null;
@@ -138,22 +142,6 @@ export default class Widget {
                 self.dialog.ticket.channel.markAsRead(() => {});
               }
             }
-
-            // Send message from query parameter after receiving the first message
-            // const FIRST_MESSAGE_TEXT = "はじめまして！Moment について詳しく聞きたいことがあったら質問してください。"
-            // const params = new URL(location.href).searchParams;
-            // if (self.dialog && message.message === FIRST_MESSAGE_TEXT && params.get('q')) {
-            //   console.log(params.get('q'), self.dialog)
-            //   self.dialog.ticket.channel
-            //     .sendUserMessage({ message: params.get('q') })
-            //     .onSucceeded((queryMessage) => {
-            //       self.dialog.appendMessage(queryMessage);
-            //       self.dialog.scrollToBottom();
-            //     })
-            //     .onFailed((error, message) => {
-            //       self.dialog.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
-            //     });
-            // }
           };
           self.sendbird.groupChannel.addGroupChannelHandler('widget', channelHandler);
 
@@ -171,7 +159,7 @@ export default class Widget {
   }
 
   startNewDialog(ticket) {
-    this.dialog = new Dialog(ticket);
+    this.dialog = new Dialog(ticket, this.thinkingIndicator);
     this.dialog.open(this);
   }
 }
