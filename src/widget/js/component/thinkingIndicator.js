@@ -11,10 +11,10 @@ export default class ThinkingIndicator {
             </div>
             <div class='content'>
               <div class='message'>
-                <div id="bot-thinking">
-                  <div class="dot"></div>
-                  <div class="dot"></div>
-                  <div class="dot"></div>
+                <div class="-custom-bot-thinking">
+                  <div class="-custom-dot"></div>
+                  <div class="-custom-dot"></div>
+                  <div class="-custom-dot"></div>
                 </div>
               </div>
             </div>
