@@ -69,7 +69,6 @@ export default class Dialog {
     this.form = simplify(this.element.querySelector('.-sbd-message-form'));
     this.input = simplify(this.form.querySelector('.message'));
     this.button = simplify(this.form.querySelector('.button'));
-    console.log(this.button)
     this.editable = true;
     // Customize for suggested questions
     this.optionList = simplify(this.element.querySelector('.-custom-suggested-question-list'));
@@ -123,9 +122,8 @@ export default class Dialog {
                 );
               });
             }
-            this.appendMessage(message);
-            this.thinkingIndicator.attachTo(this.messageList);
-            this.scrollToBottom();
+
+            this.sendingMessagePostProcessing(message);
           })
           .onFailed((error, message) => {
             this.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
@@ -137,7 +135,6 @@ export default class Dialog {
     this.options.forEach(option => {
       option.on('click', e => {
         this.optionList.hide();
-        console.log(e.target, e.target.innerText)
         if (this.ticket.status === SendBirdDesk.Ticket.Status.INITIALIZED) {
           this.ticket.status = SendBirdDesk.Ticket.Status.UNASSIGNED;
         }
@@ -149,15 +146,18 @@ export default class Dialog {
           // .onPending((message) => {
           // })
           .onSucceeded((message) => {
-            this.appendMessage(message);
-            this.thinkingIndicator.attachTo(this.messageList);
-            this.scrollToBottom();
+            this.sendingMessagePostProcessing(message);
           })
           .onFailed((error, message) => {
             this.ticket.status = SendBirdDesk.Ticket.Status.INITIALIZED;
           });
       })
     })
+  }
+  sendingMessagePostProcessing(message) {
+    this.appendMessage(message);
+    this.thinkingIndicator.attachTo(this.messageList);
+    this.scrollToBottom();
   }
   loadMessage(next, callback) {
     if (!this.query || !next) {
